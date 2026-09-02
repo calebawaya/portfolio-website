@@ -31,6 +31,38 @@ p {
   max-width: 100%;
   border-radius: 15px;
   margin: 10px;
+  background-color: #040720;
+  
+}
+
+.profile-card {
+  width: 350px;
+  padding: 15px;
+  background: linear-gradient(135deg, #111827, #2563eb);
+  border-radius: 25px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.profile-card img {
+  width: 100%;
+  display: block;
+  border-radius: 18px;
+
+  /* Change the photo's appearance */
+  filter: brightness(1.05)
+          contrast(1.1)
+          saturate(1.2);
+
+  transition: 0.4s ease;
+}
+
+/* Appearance when you move the mouse over it */
+.profile-card img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.15)
+          contrast(1.15)
+          saturate(1.4);
 }
 
 #box {
