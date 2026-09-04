@@ -44,4 +44,50 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', () => {
     if (backTop) backTop.classList.toggle('show', window.scrollY > 500);
   });
+
+  const aiForm = document.getElementById('ai-form');
+  const aiInput = document.getElementById('ai-input');
+  const aiMessages = document.getElementById('ai-messages');
+  const quickPrompts = document.querySelectorAll('[data-prompt]');
+
+  function addMessage(text, type) {
+    const message = document.createElement('div');
+    message.className = `ai-message ${type}`;
+    message.textContent = text;
+    aiMessages.appendChild(message);
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+    return message;
+  }
+
+  quickPrompts.forEach(button => {
+    button.addEventListener('click', () => {
+      aiInput.value = button.dataset.prompt || '';
+      aiInput.focus();
+    });
+  });
+
+  if (aiForm && aiInput && aiMessages) {
+    aiForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const prompt = aiInput.value.trim();
+      if (!prompt) return;
+
+      addMessage(`You: ${prompt}`, 'user');
+      aiInput.value = '';
+      const thinking = addMessage('AI: Thinking...', 'bot');
+
+      try {
+        const response = await fetch('/api/ai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: prompt })
+        });
+        const data = await response.json();
+        thinking.textContent = `AI: ${data.reply || data.error || 'I could not answer that right now.'}`;
+      } catch (error) {
+        thinking.textContent = 'AI: The live AI server is not connected yet. Run the Node.js server and configure its API key.';
+      }
+      aiMessages.scrollTop = aiMessages.scrollHeight;
+    });
+  }
 });
