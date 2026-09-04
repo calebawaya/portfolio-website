@@ -4,25 +4,63 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
+const MAX_BODY = 20 * 1024;
 
 const mimeTypes = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.png': 'image/png',
-  '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon'
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon'
 };
 
+function sendJson(res, status, data) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(data));
+}
+
+async function handleAI(req, res) {
+  if (!process.env.OPENAI_API_KEY) {
+    return sendJson(res, 503, { error: 'AI is not configured on this server yet. Add OPENAI_API_KEY as a server environment variable.' });
+  }
+
+  let body = '';
+  req.on('data', chunk => {
+    body += chunk;
+    if (body.length > MAX_BODY) req.destroy();
+  });
+
+  req.on('end', async () => {
+    try {
+      const { message } = JSON.parse(body || '{}');
+      if (!message || typeof message !== 'string') return sendJson(res, 400, { error: 'Please enter a programming question.' });
+
+      const apiResponse = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
+        body: JSON.stringify({
+          model: process.env.OPENAI_MODEL || 'gpt-5.6-luna',
+          instructions: 'You are Caleb Code AI, a friendly programming tutor. Help a beginner understand programming. Explain concepts clearly, guide debugging step by step, and encourage learning. Do not pretend Caleb already knows a technology he is still learning. When giving code, explain the important parts.',
+          input: message,
+          max_output_tokens: 1200
+        })
+      });
+
+      const data = await apiResponse.json();
+      if (!apiResponse.ok) return sendJson(res, apiResponse.status, { error: data.error?.message || 'The AI service returned an error.' });
+      return sendJson(res, 200, { reply: data.output_text || 'I could not generate a response.' });
+    } catch (error) {
+      return sendJson(res, 500, { error: 'The AI server could not process that request.' });
+    }
+  });
+}
+
 const server = http.createServer((req, res) => {
-  let requestedPath = decodeURIComponent(req.url.split('?')[0]);
+  if (req.method === 'POST' && req.url === '/api/ai') return handleAI(req, res);
+
+  let requestedPath;
+  try { requestedPath = decodeURIComponent(req.url.split('?')[0]); } catch { return sendJson(res, 400, { error: 'Bad request.' }); }
   if (requestedPath === '/') requestedPath = '/index.html';
 
-  const filePath = path.join(ROOT, requestedPath);
-  if (!filePath.startsWith(ROOT)) {
+  const filePath = path.resolve(ROOT, `.${requestedPath}`);
+  if (filePath !== ROOT && !filePath.startsWith(`${ROOT}${path.sep}`)) {
     res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     return res.end('Forbidden');
   }
@@ -30,23 +68,15 @@ const server = http.createServer((req, res) => {
   fs.stat(filePath, (statError, stats) => {
     if (!statError && stats.isFile()) {
       const ext = path.extname(filePath).toLowerCase();
-      const contentType = mimeTypes[ext] || 'application/octet-stream';
-      res.writeHead(200, { 'Content-Type': contentType });
+      res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
       return fs.createReadStream(filePath).pipe(res);
     }
-
-    const indexPath = path.join(ROOT, 'index.html');
-    fs.readFile(indexPath, (error, data) => {
-      if (error) {
-        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-        return res.end('Server error');
-      }
+    fs.readFile(path.join(ROOT, 'index.html'), (error, data) => {
+      if (error) return sendJson(res, 500, { error: 'Server error.' });
       res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(data);
     });
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Portfolio server running at http://localhost:${PORT}`);
-});
+server.listen(PORT, () => console.log(`Portfolio server running at http://localhost:${PORT}`));
