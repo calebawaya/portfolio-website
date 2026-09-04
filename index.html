@@ -3,46 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="style.css" rel="stylesheet">
-  <title>Caleb Awaya Web Site</title>
+  <meta name="description" content="Caleb Awaya's personal web development portfolio.">
+  <title>Caleb Awaya | Web Developer</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Caleb Awaya Personal Web Site</h1>
-
-  <section class="about">
-    <h2>About</h2>
-    <img src="image_43455fbf.jpg" alt="Caleb Awaya">
-    <p>Caleb Awaya is a student from AVI - GALLOPERS.</p>
-    
-  </section>
-
-  <section>
-    <h2>Skills</h2>
-    <p>We teach all kind of programming language from beginner to professional.</p>
-<div class="profile-card">
-  <img src="my-photo.jpg" alt="My photo">
-</div>
-    <div id="box">
-      <div class="box1">
-        <h3>HTML</h3>
-        <p>Build the structure of websites.</p>
-      </div>
-      <div class="box2">
-        <h3>CSS</h3>
-        <p>Style websites with colors, spacing and layouts.</p>
-      </div>
-      <div class="box3">
-        <h3>JavaScript</h3>
-        <p>Add interaction and animation to websites.</p>
-      </div>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="logo" href="#home">Caleb<span>.</span></a>
+      <button class="menu-button" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="#home">Home</a><a href="#about">About</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#contact">Contact</a>
+      </nav>
     </div>
-  </section>
+  </header>
 
-  <ul>
-    <li>HTML</li>
-    <li>CSS</li>
-    <li>JavaScript</li>
-    <li>Python</li>
-  </ul>
+  <main id="home">
+    <section class="hero container reveal">
+      <div class="hero-text">
+        <p class="eyebrow">WELCOME TO MY PORTFOLIO</p>
+        <h1>Hi, I'm <span>Caleb Awaya</span>.</h1>
+        <p class="hero-copy">I'm learning web development and building modern, responsive websites with HTML, CSS and JavaScript.</p>
+        <div class="hero-actions"><a class="button primary" href="#projects">View My Work</a><a class="button secondary" href="#contact">Contact Me</a></div>
+      </div>
+      <div class="profile-card">
+        <div class="image-container"><img src="image_43455fbf.jpg" alt="Portrait of Caleb Awaya"></div>
+        <h2>Future Web Developer</h2><p>Learning today. Building tomorrow.</p>
+      </div>
+    </section>
+
+    <section id="about" class="section container reveal">
+      <p class="eyebrow">ABOUT ME</p><h2>Turning ideas into websites</h2>
+      <p class="section-copy">I am a student from AVI - GALLOPERS, developing my skills in programming and web design. My goal is to create websites that look great, work smoothly and are easy to use.</p>
+    </section>
+
+    <section id="skills" class="section container reveal">
+      <p class="eyebrow">MY SKILLS</p><h2>What I'm learning</h2>
+      <div id="box" class="cards">
+        <article class="skill-card"><div class="icon">HTML</div><h3>HTML</h3><p>Build the structure and content of websites.</p></article>
+        <article class="skill-card"><div class="icon">CSS</div><h3>CSS</h3><p>Create attractive layouts, colors, spacing and responsive designs.</p></article>
+        <article class="skill-card"><div class="icon">JS</div><h3>JavaScript</h3><p>Add interaction, dynamic features and animation to websites.</p></article>
+      </div>
+    </section>
+
+    <section id="projects" class="section container reveal">
+      <p class="eyebrow">PROJECTS</p><h2>Things I'm building</h2>
+      <div class="project-grid">
+        <article class="project-card"><h3>Personal Portfolio</h3><p>A responsive website that introduces me, my skills and my projects.</p><span>HTML • CSS • JavaScript</span></article>
+        <article class="project-card"><h3>Gallopers 10th Anniversary</h3><p>A future event website designed to make guests excited about the celebration.</p><span>Web Design • Animation</span></article>
+        <article class="project-card"><h3>More Coming Soon</h3><p>I'm continuing to learn and will add new projects as I build them.</p><span>Learning • Creating</span></article>
+      </div>
+    </section>
+
+    <section id="contact" class="section contact-section reveal"><div class="container">
+      <p class="eyebrow">CONTACT</p><h2>Let's build something great.</h2>
+      <p class="section-copy">Interested in my work? You can reach me through email.</p>
+      <a class="button primary" href="mailto:caleb.awaya@mentorswithoutborders.net">Email Me</a>
+    </div></section>
+  </main>
+
+  <footer><p>© <span id="year"></span> Caleb Awaya. Built with HTML, CSS & JavaScript.</p></footer>
+  <script src="script.js"></script>
 </body>
 </html>
